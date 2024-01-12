@@ -8,10 +8,10 @@ import { faHeart} from '@fortawesome/free-solid-svg-icons';
 
 export default function Card() {
     return (
-    <div className="card rounded position-relative" style={{width: "18rem"}}>
+    <div className="card rounded position-relative shadow" style={{width: "18rem"}}>
         <div className="position-absolute  position-relative rounded bg-white shadow" 
         style={{width:"39px",height:"36px", top:"10px",right:"10px"}}>
-        <FontAwesomeIcon className="text-secondary fs-4 m-auto center" icon={faHeart} />
+        <FontAwesomeIcon className="text-secondary fs-4 center" icon={faHeart} />
         </div>
         <img className="card-img-top" src={Product} alt="Card image cap"/>
         <div className="card-body" style={{backgroundColor:"var(--card-color)"}}>
