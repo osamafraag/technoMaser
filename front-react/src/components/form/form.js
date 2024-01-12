@@ -1,6 +1,10 @@
 import React from 'react'
+import { useDispatch } from "react-redux";
+import {truncateCart} from "./../../store/slices/cart";
 
-export default function Form() {
+export default function Form(props) {
+    const {confirm} = props
+    const dispatch = useDispatch();
     return (
     <div className="" style={{marginBottom:"75px"}}>
         <h3 className='text-center my-3' style={{color:"var(--main-color)"}}>Location</h3>
@@ -22,6 +26,7 @@ export default function Form() {
             </form>
         </div>
         <a className="btn text-light text-center fs-3 mt-5" 
+            onClick={()=>{confirm(); dispatch(truncateCart())}}
             style={{width:"359px",height:"56px",backgroundColor:"var(--icon-color)",marginLeft:"535px"}}>Confirm Payment</a>
     </div>
     )
