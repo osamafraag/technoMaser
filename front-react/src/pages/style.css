@@ -1,0 +1,16 @@
+.landing {
+    background-image: url("../assets/pictures/Rectangle\ 442.png") !important;
+    background-position: center 10% !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    position: relative;
+    height: 700px
+  }
+  .center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }

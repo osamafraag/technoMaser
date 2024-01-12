@@ -14,4 +14,8 @@ code {
 :root {
   --main-color: #0B4A72;
   --secondary-color: #F3F3F3;
+  --icon-color: #E98316;
+  --text-color:#3F3F3F;
+  --card-color:#ECECEC;
+  ;
 }

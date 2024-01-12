@@ -7,9 +7,7 @@ function App() {
   return (
     <BrowserRouter>
       <HeaderNav />
-        <div className='container bg-light'>
-          <Router/>
-        </div>
+      <Router/>
     </BrowserRouter>
   );
 }
