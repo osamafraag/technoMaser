@@ -28,11 +28,11 @@ Route::prefix('client')->group(function () {
 
 
 Route::post('login', function (Request $request) {
-    if  ($request->email){
-        $user = Myuser::where('email', $request->email)->first();
+    if  ($request->emailOrPhone){
+        $user = Myuser::where('email', $request->emailOrPhone)->first();
     }
-    if  ($request->phone){
-        $user = Myuser::where('phone', $request->phone)->first();
+    if  (!$user){
+        $user = Myuser::where('phone', $request->emailOrPhone)->first();
     }
     
     if (!$user || !Hash::check($request->password, $user->password)) {
