@@ -1,7 +1,7 @@
 import { axiosInstance } from "./config";
 
 export const RolesData = (token) => {
-  return axiosInstance.get('/api/admin/users', {
+  return axiosInstance.get('/api/admin/roles', {
     headers: {"Authorization":token},
   });
 };
@@ -22,6 +22,16 @@ export const EditRole = (token,roleId,form) => {
   };
   export const DeleteRole = (token,roleId) => {
     return axiosInstance.delete(`/api/admin/roles/${roleId}`, {
+      headers: {"Authorization":token},
+    });
+  };
+  export const AssignRole = (token,form) => {
+    return axiosInstance.post(`/api/admin/role`,form ,{
+      headers: {"Authorization":token},
+    });
+  };
+  export const UserRoles = (token,id) => {
+    return axiosInstance.get(`/api/admin/userRoles/${id}`,{
       headers: {"Authorization":token},
     });
   };

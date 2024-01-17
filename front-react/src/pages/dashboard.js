@@ -2,14 +2,18 @@ import React,{useState,useEffect} from 'react'
 import { UsersData,AddUser,EditUser,DeleteUser } from './../APIs/users'
 import { useContext } from "react";
 import { TokenContext } from '../context/token';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
+import UsersTable from '../components/users/usersTable';
+import UserForm from '../components/users/usersForm';
 import { useNavigate } from "react-router-dom";
+import { RolesData,AssignRole,UserRoles } from '../APIs/roles';
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const { Token , setToken }  = useContext(TokenContext)
   const[users,setUsers] = useState([]);
+  const[roles,setRoles] = useState([]);
+  const[userRoles,setUserRoles] = useState([]);
+  const[roleId,setRoleId] = useState(0);
   const[show,setShow] = useState(false);
   const[selectId,setSelectId] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '',phone:'',photo:'path',password:'' });
@@ -27,13 +31,28 @@ export default function Dashboard() {
             setUsers(result.data)
           })
           .catch((error) => console.log(error));
+        
+        RolesData(Token)
+          .then((result) => {
+            setRoles(result.data)
+          })
+          .catch((error) => console.log(error))
         }
         }, []);
+      
     const handleDelete = (id)=>{
       DeleteUser(Token,id)
       .then((result)=>{console.log(result)})
       .catch((error)=>{console.log(error)})
     }
+    const showEdit = (user)=>{
+        setFormData({name: user.name, email: user.email,phone:user.phone,photo:'path',password:'' });
+        setSelectId(user.id);
+        UserRoles(user.id).then((res)=>{setUserRoles(res.data.roles)})
+        .catch((error)=>{console.log(error)});
+        setShow(true);
+      }
+
     const handleEdit = async (e,id)=>{
       e.preventDefault();
       EditUser(Token,id,formData)
@@ -50,71 +69,12 @@ export default function Dashboard() {
     }
     return (
     <div className='container'>
-      <a className='btn btn-primary m-2' onClick={()=>{setShow(true)}}>Add</a>
-        <table class="table table-striped">
-          <thead>
-          <tr>
-          <th scope="col">Photo</th>
-          <th scope="col">Name</th>
-          <th scope="col">Email</th>
-          <th scope="col">phone</th>
-          <th scope="col">action</th>
-          </tr>
-          </thead>
-  <tbody>
-    {users?.map((user,index)=>{
-        return(
-            <tr>
-      <td>{user.photo}</td>
-      <td>{user.name}</td>
-      <td>{user.email}</td>
-      <td>{user.phone}</td>
-      <td>
-        <a className='btn btn-danger m-2' onClick={()=>{handleDelete(user.id)}}>Delete</a>
-        <a className='btn btn-warning m-2' onClick={()=>{
-        setFormData({name: user.name, email: user.email,phone:user.phone,photo:'path',password:'' });
-        setSelectId(user.id);setShow(true)}}>Edit</a>
-      </td>
-    </tr>
-
-        )
-    })}
-    
-  </tbody>
-</table>
-<Modal show={show} onHide={()=>{setShow(false)}} animation={false}>
-        <Modal.Header closeButton>
-          <Modal.Title>{selectId? <span> Add User</span> : <span> Edit User</span>}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="input-group mx-auto w-50 my-3">
-            <span className="input-group-text" for="baseCost">name</span>
-            <input type="text" class="form-control" required name='name'
-            onChange={()=>{handleChange()}} value={formData?.name}/>
-          </div>
-          <div className="input-group mx-auto w-50 my-3">
-            <span className="input-group-text" for="baseCost">email</span>
-            <input type="email" class="form-control" required name='email'
-            onChange={()=>{handleChange()}} value={formData?.email}/>
-          </div>
-          <div className="input-group mx-auto w-50 my-3">
-            <span className="input-group-text" for="baseCost">phone</span>
-            <input type="text" class="form-control" required name='phone'
-            onChange={()=>{handleChange()}} value={formData?.phone}/>
-          </div>
-          <div className="input-group mx-auto w-50 my-3">
-            <span className="input-group-text" for="baseCost">password</span>
-            <input type="password" class="form-control" required name='password'
-            onChange={()=>{handleChange()}} value={formData?.password}/>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant='secondary' 
-          onClick={() => {selectId? handleEdit(selectId):handleAdd(); setShow(false) }}>
-            {selectId? <span> Add User</span> : <span> Edit User</span>}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <a className='btn btn-primary m-2' onClick={()=>{setSelectId(null);setShow(true)}}>Add USER</a>
+      <a className='btn btn-primary m-2' onClick={()=>{setSelectId(null);setShow(true)}}>Add ROLE</a>
+      <a className='btn btn-primary m-2' onClick={()=>{console.log(Token)}}>Add PERMISSION</a>
+      <UsersTable usersData={users} showEdit={showEdit} handleDelete={handleDelete}/>
+      <UserForm show={show} setShow={setShow} selectId={selectId} formData={formData} userRoles={userRoles}
+      roles={roles} setRoleId={setRoleId} handleAdd={handleAdd} handleEdit={handleEdit} handleChange={handleChange}/>
     </div>
     )
 }

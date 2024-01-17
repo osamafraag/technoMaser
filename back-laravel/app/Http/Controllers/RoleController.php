@@ -67,5 +67,12 @@ class RoleController extends Controller
         $role->permissions()->toggle($permission);
         return response()->json(['message' => $permission,$role->permissions]);
     }
+    public function retrieveRoles($id)
+    {
+        $user = Myuser::findOrFail(1);
+        $roles = $user->roles()->get();
+
+        return response()->json(['roles' => $roles]);
+    }
 }
 

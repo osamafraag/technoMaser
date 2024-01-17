@@ -16,6 +16,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('permissions', PermissionController::class)->middleware('role:admin');
     Route::post('role', [RoleController::class, 'toggleRoleToUser'])->middleware('role:admin');
     Route::post('permission', [RoleController::class, 'toggleRoleToPermission'])->middleware('role:admin');
+    Route::get('userRoles/{id}', [RoleController::class, 'retrieveRoles']);
     
 });
 
@@ -30,11 +31,10 @@ Route::prefix('client')->group(function () {
 Route::post('login', function (Request $request) {
     if  ($request->emailOrPhone){
         $user = Myuser::where('email', $request->emailOrPhone)->first();
+        if  (!$user){
+            $user = Myuser::where('phone', $request->emailOrPhone)->first();
+        }
     }
-    if  (!$user){
-        $user = Myuser::where('phone', $request->emailOrPhone)->first();
-    }
-    
     if (!$user || !Hash::check($request->password, $user->password)) {
         return response()->json(['error' => 'Invalid credentials'], 401);
     }
