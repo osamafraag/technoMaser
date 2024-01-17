@@ -69,7 +69,7 @@ class RoleController extends Controller
     }
     public function retrieveRoles($id)
     {
-        $user = Myuser::findOrFail(1);
+        $user = Myuser::findOrFail($id);
         $roles = $user->roles()->get();
 
         return response()->json(['roles' => $roles]);

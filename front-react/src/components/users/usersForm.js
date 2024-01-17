@@ -2,7 +2,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 
 export default function UserForm(props) {
-    const {show,setShow,selectId,formData,userRoles,roles,setRoleId,handleAdd,handleEdit,handleChange} = props;
+    const {show,setShow,selectId,formData,roleId,roles,setRoleId,handleAdd,handleEdit,handleChange} = props;
     return(
        <Modal show={show} onHide={()=>{setShow(false)}} animation={false}>
         <Modal.Header closeButton>
@@ -31,7 +31,7 @@ export default function UserForm(props) {
           </div>
           <div className="input-group mx-auto w-50 my-3">
           <select className="form-select form-select-sm" aria-label=".form-select-sm example"
-          onChange={(e)=>{setRoleId(e.target.value)}} value={userRoles[0]?.id}>
+          onChange={(e)=>{setRoleId(e.target.value)}} value={roleId}>
             {roles.map((role,index)=>{
               return(
                 <option value={role.id}>{role.name}</option>
@@ -43,7 +43,7 @@ export default function UserForm(props) {
         </Modal.Body>
         <Modal.Footer>
           <Button variant='secondary' 
-          onClick={(e) => {selectId? handleEdit(e,selectId):handleAdd(); setShow(false) }}>
+          onClick={(e) => {selectId? handleEdit(e,selectId):handleAdd(e); setShow(false) }}>
             {selectId? <span> Edit User</span> : <span> Add User</span>}
           </Button>
         </Modal.Footer>

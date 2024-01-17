@@ -5,14 +5,21 @@ import { TokenContext } from '../context/token';
 import UsersTable from '../components/users/usersTable';
 import UserForm from '../components/users/usersForm';
 import { useNavigate } from "react-router-dom";
-import { RolesData,AssignRole,UserRoles } from '../APIs/roles';
+import { RolesData,AssignRole,UserRoles ,AddRole} from '../APIs/roles';
+import { AddPermission } from '../APIs/permissions';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button'; 
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { Token , setToken }  = useContext(TokenContext)
+  const { Token , setToken }  = useContext(TokenContext);
+  const[refresh,setRefresh] = useState(false);
+  const[showRole,setShowRole] = useState(false);
+  const[showPer,setShowPer] = useState(false);
+  const[perName,setPerName] = useState('');
+  const[roleName,setRoleName] = useState('');
   const[users,setUsers] = useState([]);
   const[roles,setRoles] = useState([]);
-  const[userRoles,setUserRoles] = useState([]);
   const[roleId,setRoleId] = useState(0);
   const[show,setShow] = useState(false);
   const[selectId,setSelectId] = useState(null);
@@ -38,7 +45,7 @@ export default function Dashboard() {
           })
           .catch((error) => console.log(error))
         }
-        }, []);
+        }, [refresh]);
       
     const handleDelete = (id)=>{
       DeleteUser(Token,id)
@@ -48,33 +55,90 @@ export default function Dashboard() {
     const showEdit = (user)=>{
         setFormData({name: user.name, email: user.email,phone:user.phone,photo:'path',password:'' });
         setSelectId(user.id);
-        UserRoles(user.id).then((res)=>{setUserRoles(res.data.roles)})
+        UserRoles(user.id).then((res)=>{setRoleId(res.data.roles[0].id)})
         .catch((error)=>{console.log(error)});
         setShow(true);
       }
-
+    
     const handleEdit = async (e,id)=>{
       e.preventDefault();
       EditUser(Token,id,formData)
-      .then((result)=>{console.log(result)})
+      .then((result)=>{
+        AssignRole(Token,{user:id,role:roleId})
+        .then((result)=>{console.log(result)})
+        .catch((error)=>{console.log(error)});
+        setFormData({name: '', email: '',phone:'',photo:'path',password:'' });
+        setRefresh(!refresh);
+        setSelectId(null)
+    })
       .catch((error)=>{console.log(error)});
-      setFormData({name: '', email: '',phone:'',photo:'path',password:'' });
-      setSelectId(null)
+    }
+    const handleAddClick =()=>{
+      setFormData({ name: '', email: '',phone:'',photo:'path',password:'' });
+      setSelectId(null);
+      setShow(true)
     }
     const handleAdd = async (e)=>{
       e.preventDefault();
       AddUser(Token,formData)
-      .then((result)=>{console.log(result)})
-      .catch((error)=>{console.log(error)})
+      .then((result)=>{
+        AssignRole(Token,{user:3,role:2})
+        .then((result)=>{console.log(result)})
+        .catch((error)=>{console.log(error)});
+        setRefresh(!refresh)
+      })
+      .catch((error)=>{console.log(error)});
+      
+      
     }
     return (
     <div className='container'>
-      <a className='btn btn-primary m-2' onClick={()=>{setSelectId(null);setShow(true)}}>Add USER</a>
-      <a className='btn btn-primary m-2' onClick={()=>{setSelectId(null);setShow(true)}}>Add ROLE</a>
-      <a className='btn btn-primary m-2' onClick={()=>{console.log(Token)}}>Add PERMISSION</a>
+      <a className='btn btn-primary m-2' onClick={()=>{handleAddClick()}}>Add USER</a>
+      <a className='btn btn-primary m-2' onClick={()=>{setShowRole(true)}}>Add ROLE</a>
+      <a className='btn btn-primary m-2' onClick={()=>{setShowPer(true)}}>Add PERMISSION</a>
       <UsersTable usersData={users} showEdit={showEdit} handleDelete={handleDelete}/>
-      <UserForm show={show} setShow={setShow} selectId={selectId} formData={formData} userRoles={userRoles}
-      roles={roles} setRoleId={setRoleId} handleAdd={handleAdd} handleEdit={handleEdit} handleChange={handleChange}/>
+      <UserForm show={show} setShow={setShow} selectId={selectId} formData={formData} roleId={roleId}
+      roles={roles} setRoleId={setRoleId} handleAdd={(e)=>handleAdd(e)} handleEdit={handleEdit} handleChange={handleChange}/>
+      <Modal show={showRole} onHide={()=>{setShowRole(false)}} animation={false}>
+        <Modal.Header closeButton>
+          <Modal.Title><span> Add Role</span></Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="input-group mx-auto w-50 my-3">
+            <span className="input-group-text" for="baseCost">name</span>
+            <input type="text" class="form-control" required name='name'
+            onChange={(e)=>{setRoleName(e.target.value)}}/>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant='secondary' 
+          onClick={(e) => {AddRole(Token,{name:roleName})
+          .then((res)=>{setRefresh(!refresh);setShowRole(false)})
+          .catch((error)=>{console.log(error);console.log(roleName)})}}>
+            Add Role
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={showPer} onHide={()=>{setShowPer(false)}} animation={false}>
+        <Modal.Header closeButton>
+          <Modal.Title><span> Add Permission</span></Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="input-group mx-auto w-50 my-3">
+            <span className="input-group-text" for="baseCost">name</span>
+            <input type="text" class="form-control" required name='name'
+            onChange={(e)=>{setPerName(e.target.value)}}/>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant='secondary' 
+          onClick={(e) => {AddPermission(Token,{name:perName})
+          .then((res)=>{setRefresh(!refresh); setShowPer(false)})
+          .catch((error)=>{})}}>
+            Add Permission
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
     )
 }

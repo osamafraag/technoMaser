@@ -14,7 +14,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('users', UserController::class)->middleware('role:admin');
     Route::apiResource('roles', RoleController::class)->middleware('role:admin');
     Route::apiResource('permissions', PermissionController::class)->middleware('role:admin');
-    Route::post('role', [RoleController::class, 'toggleRoleToUser'])->middleware('role:admin');
+    Route::post('role', [RoleController::class, 'toggleRoleToUser']);
     Route::post('permission', [RoleController::class, 'toggleRoleToPermission'])->middleware('role:admin');
     Route::get('userRoles/{id}', [RoleController::class, 'retrieveRoles']);
     
