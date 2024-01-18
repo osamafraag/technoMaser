@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Myuser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -12,11 +13,16 @@ class UserController extends Controller
     }
     public function store(Request $request)
     {
+        $file = $request->file('photo');
+        // $path = Storage::putFile('images', $file);
+        // $filePath = $file->storeOnCloudinary('my_folder', ['resource_type' => 'auto']);
+        // $imageName = time() . '.' . $file->extension();
+        // $request->image->storeAs('public/images', $imageName);
         $user = Myuser::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'photo' => $request->photo,
+            'photo' => $file,
             'password' => bcrypt($request->password)
         ]);
 

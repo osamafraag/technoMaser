@@ -20,10 +20,14 @@ export default function Dashboard() {
   const[roleName,setRoleName] = useState('');
   const[users,setUsers] = useState([]);
   const[roles,setRoles] = useState([]);
-  const[roleId,setRoleId] = useState(0);
+  const[roleId,setRoleId] = useState(null);
   const[show,setShow] = useState(false);
   const[selectId,setSelectId] = useState(null);
-  const [formData, setFormData] = useState({ name: '', email: '',phone:'',photo:'path',password:'' });
+  const[image,setImage] = useState(null);
+  const handleImage = (e)=>{
+    setImage(e.target.files[0]);
+  }
+  const [formData, setFormData] = useState({ name: '', email: '',phone:'',password:'' });
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
  };
@@ -53,7 +57,7 @@ export default function Dashboard() {
       .catch((error)=>{console.log(error)})
     }
     const showEdit = (user)=>{
-        setFormData({name: user.name, email: user.email,phone:user.phone,photo:'path',password:'' });
+        setFormData({name: user.name, email: user.email,phone:user.phone,password:'' });
         setSelectId(user.id);
         UserRoles(user.id).then((res)=>{setRoleId(res.data.roles[0].id)})
         .catch((error)=>{console.log(error)});
@@ -62,30 +66,39 @@ export default function Dashboard() {
     
     const handleEdit = async (e,id)=>{
       e.preventDefault();
-      EditUser(Token,id,formData)
+      let data=formData;
+      data.photo=image
+      EditUser(Token,id,data)
       .then((result)=>{
         AssignRole(Token,{user:id,role:roleId})
         .then((result)=>{console.log(result)})
         .catch((error)=>{console.log(error)});
-        setFormData({name: '', email: '',phone:'',photo:'path',password:'' });
+        setFormData({name: '', email: '',phone:'',password:'' });
+        setImage(null);
         setRefresh(!refresh);
-        setSelectId(null)
+        setSelectId(null);
+        setShow(false);
     })
       .catch((error)=>{console.log(error)});
     }
     const handleAddClick =()=>{
-      setFormData({ name: '', email: '',phone:'',photo:'path',password:'' });
+      setFormData({ name: '', email: '',phone:'',password:'' });
       setSelectId(null);
       setShow(true)
     }
     const handleAdd = async (e)=>{
       e.preventDefault();
-      AddUser(Token,formData)
+      let data=formData;
+      data.photo=image
+      console.log(data)
+      AddUser(Token,data)
       .then((result)=>{
-        AssignRole(Token,{user:3,role:2})
+        AssignRole(Token,{user:result.data.id,role:roleId})
         .then((result)=>{console.log(result)})
         .catch((error)=>{console.log(error)});
-        setRefresh(!refresh)
+        setRefresh(!refresh);
+        setImage(null);
+        setShow(false)
       })
       .catch((error)=>{console.log(error)});
       
@@ -97,7 +110,7 @@ export default function Dashboard() {
       <a className='btn btn-primary m-2' onClick={()=>{setShowRole(true)}}>Add ROLE</a>
       <a className='btn btn-primary m-2' onClick={()=>{setShowPer(true)}}>Add PERMISSION</a>
       <UsersTable usersData={users} showEdit={showEdit} handleDelete={handleDelete}/>
-      <UserForm show={show} setShow={setShow} selectId={selectId} formData={formData} roleId={roleId}
+      <UserForm show={show} setShow={setShow} selectId={selectId} formData={formData} roleId={roleId} handleImage={handleImage}
       roles={roles} setRoleId={setRoleId} handleAdd={(e)=>handleAdd(e)} handleEdit={handleEdit} handleChange={handleChange}/>
       <Modal show={showRole} onHide={()=>{setShowRole(false)}} animation={false}>
         <Modal.Header closeButton>
